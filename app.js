@@ -18,18 +18,18 @@ app.use(morgan("dev"));
 // API Documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
-// Define routes
+// Define/Invoca las routes
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/commerce", require("./routes/commerce"));
+app.use("/api/tracks", require("./routes/tracks"));
 app.use("/api/storage", require("./routes/storage"));
 
-// Error handling middleware
+// Error middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something broke!");
 });
 
-// Server port
+// Puerto del server
 const port = process.env.PORT || 3000;
 
 // Start server
