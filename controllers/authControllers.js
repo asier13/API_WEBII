@@ -1,105 +1,72 @@
-const { matchedData } = require("express-validator")
-const { tokenSign } = require("../utils/handleJwt")
-const { encrypt, compare } = require("../utils/handlePassword")
-const {handleHttpError} = require("../utils/handleError")
-const {User} = require("../models")
+const jwt = require('jsonwebtoken');
+const { matchedData, validationResult } = require('express-validator');
+const handleJWT = require('../utils/handleJWT');
+const handlePassword = require('../utils/handlePassword');
+const User = require('../models/mysql/users');
 
-/**
- * Encargado de registrar un nuevo usuario
- * @param {*} req 
- * @param {*} res 
- */
-const registerCtrl = async (req, res) => {
-    try {
-        req = matchedData(req)
-        const password = await encrypt(req.password)
-        const body = {...req, password} // Con "..." duplicamos el objeto y le añadimos o sobreescribimos una propiedad
-        const dataUser = await User.create(body)
-        //Si no queremos que se devuelva el hash con "findOne", en el modelo de users ponemos select: false en el campo password
-        //Además, en este caso con "create", debemos setear la propiedad tal que:  
-        dataUser.set('password', undefined, { strict: false })
+const login = async (req, res, next) => {
+  try {
+    validationResult(req).throw();
 
-        const data = {
-            token: await tokenSign(dataUser),
-            user: dataUser
-        }
-        res.send(data)  
-    }catch(err) {
-        console.log(err)
-        handleHttpError(res, "ERROR_REGISTER_USER")
+    const { email, password } = matchedData(req);
+    const user = await User.findByEmail(email);
+
+    if (!user) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
-}
 
-
-/**
- * Encargado de hacer login del usuario
- * @param {*} req 
- * @param {*} res 
- */
-const loginCtrl = async (req, res) => {
-    try {
-        req = matchedData(req)
-        const user = await User.findOne({ email: req.email })
-
-        if(!user){
-            handleHttpError(res, "USER_NOT_EXISTS", 404)
-            return
-        }
-        
-        const hashPassword = user.password;
-        const check = await compare(req.password, hashPassword)
-
-        if(!check){
-            handleHttpError(res, "INVALID_PASSWORD", 401)
-            return
-        }
-
-        //Si no quisiera devolver el hash del password
-        user.set('password', undefined, {strict: false})
-        const data = {
-            token: await tokenSign(user),
-            user
-        }
-
-        res.send(data)
-
-    }catch(err){
-        console.log(err)
-        handleHttpError(res, "ERROR_LOGIN_USER")
+    if (!user.isActive) {
+      return res.status(401).json({ message: 'El usuario no está activo' });
     }
-}
 
-const updateUser = async (req, res) => {
-    try {
-        const {id, ...body} = matchedData(req)
-        body.role = "admin"
-        const data = await User.findByIdAndUpdate(id, body)
-        res.send(data)    
-    }catch(err){
-        console.log(err) 
-        handleHttpError(res, 'ERROR_UPDATE_USER')
+    const isMatch = await handlePassword.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
-}
 
-const deleteUser = async (req, res) => {
-    try {
-        const {id} = matchedData(req)
-        const data = await User.findByIdAndDelete(id)
-        res.send(data)
-    } catch(err){
-        console.log(err)
-        handleHttpError(res, 'ERROR_DELETE_USER')
+    const token = handleJWT.sign(user);
+
+    res.status(200).json({ token });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const register = async (req, res, next) => {
+  try {
+    validationResult(req).throw();
+
+    const { name, email, password } = matchedData(req);
+    const existingUser = await User.findByEmail(email);
+
+    if (existingUser) {
+      return res.status(409).json({ message: 'El usuario ya existe' });
     }
-}
 
-const getUsers = async (req, res) => {
-    try {
-        const data = await User.find({})
-        res.send(data)
-    } catch (err) {
-        console.log(err)
-        handleHttpError(res, 'ERROR_GET_USERS')
-    }
-}
+    const hashedPassword = await handlePassword.hash(password);
+    const user = await User.create({ name, email, password: hashedPassword });
 
-module.exports = { registerCtrl, loginCtrl, updateUser, getUsers, deleteUser }
+    const token = handleJWT.sign(user);
+
+    res.status(201).json({ message: 'Usuario creado', token });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const logout = async (req, res, next) => {
+  try {
+    validationResult(req).throw();
+    
+    res.status(200).json({ message: 'Sesión cerrada exitosamente' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  login,
+  register,
+  logout,
+};

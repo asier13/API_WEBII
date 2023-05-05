@@ -20,7 +20,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Define/Invoca las routes
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/tracks", require("./routes/tracks"));
+app.use("/api/tracks", require("./routes/commerce"));
 app.use("/api/storage", require("./routes/storage"));
 
 // Error middleware

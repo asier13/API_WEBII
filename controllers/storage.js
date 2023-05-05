@@ -37,18 +37,24 @@ const getItem = async (req, res) => {
 };
 
 /**
- * Inserta un registro
+ * Inserta o actualiza un registro
  * @param {*} req 
  * @param {*} res 
  */
-const createItem = async (req, res) => {
+const saveItem = async (req, res) => {
   try {
     const { file } = req;
+    const { id } = req.params;
     const fileData = { 
       filename: file.filename,
       url: `${PUBLIC_URL}/${file.filename}`
     };
-    const data = await storageModel.create(fileData);
+    let data;
+    if (id) {
+      data = await storageModel.findByIdAndUpdate(id, fileData, { new: true });
+    } else {
+      data = await storageModel.create(fileData);
+    }
     res.send(data);
   } catch(err) {
     handleHttpError(res, 'ERROR_DETAIL_ITEM');
@@ -77,4 +83,20 @@ const deleteItem = async (req, res) => {
   }
 };
 
-module.exports = { getItems, getItem, createItem, deleteItem };
+/**
+ * Descargar un archivo
+ * @param {*} req 
+ * @param {*} res 
+ */
+const downloadItem = async (req, res) => {
+  try {
+    const { id } = matchedData(req);
+    const data = await storageModel.findById(id);
+    const filePath = path.join(MEDIA_PATH, data.filename);
+    res.download(filePath);
+  } catch(err) {
+    handleHttpError(res, 'ERROR_DOWNLOAD_ITEM');
+  }
+};
+
+module.exports = { getItems, getItem, saveItem, deleteItem, downloadItem };

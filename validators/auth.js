@@ -1,18 +1,33 @@
-const { check } = require("express-validator");
-const handleValidators = require("../utils/handleValidators");
+const { body } = require('express-validator');
+const { handleValidator } = require('../utils/handleValidator');
 
-const validatorCreateUser = [
-  check("email").isEmail(),
-  check("password").isLength({ min: 6 }),
-  check("name").notEmpty(),
-  check("address").notEmpty(),
-  handleValidators,
-];
+exports.loginValidator = handleValidator([
+  body('email').isEmail(),
+  body('password').notEmpty(),
+]);
 
-const validatorLogin = [
-  check("email").isEmail(),
-  check("password").isLength({ min: 6 }),
-  handleValidators,
-];
+exports.registerValidator = handleValidator([
+  body('Nombre').notEmpty(),
+  body('Apellido').notEmpty(),
+  body('email').isEmail(),
+  body('password').notEmpty(),
+]);
 
-module.exports = { validatorCreateUser, validatorLogin };
+exports.updateUserValidator = handleValidator([
+  body('Nombre').notEmpty(),
+  body('Apellido').notEmpty(),
+  body('email').isEmail(),
+]);
+
+exports.changePasswordValidator = handleValidator([
+  body('oldPassword').notEmpty(),
+  body('newPassword').notEmpty(),
+]);
+
+exports.resetPasswordValidator = handleValidator([
+  body('email').isEmail(),
+]);
+
+exports.newPasswordValidator = handleValidator([
+  body('password').notEmpty(),
+]);

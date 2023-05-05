@@ -39,26 +39,32 @@ const options = {
             nombre: {
               type: "string",
               example: "Mi Comercio",
+              maxLength: 50,
             },
             direccion: {
               type: "string",
               example: "Calle Falsa 123",
+              maxLength: 100,
             },
             telefono: {
               type: "string",
               example: "912345678",
+              pattern: "^[0-9]{9}$",
             },
             horario: {
               type: "string",
               example: "De lunes a viernes de 9:00 a 18:00",
+              maxLength: 100,
             },
             descripcion: {
               type: "string",
               example: "Mi comercio es el mejor de la ciudad",
+              maxLength: 500,
             },
             logo: {
               type: "string",
               example: "https://miweb.com/mi-logo.png",
+              format: "url",
             },
           },
         },
@@ -69,14 +75,17 @@ const options = {
             name: {
               type: "string",
               example: "Menganito",
+              maxLength: 50,
             },
             email: {
               type: "string",
               example: "miemail@google.com",
+              format: "email",
             },
             password: {
               type: "string",
               example: "mysecretpassword",
+              minLength: 8,
             },
           },
         },
