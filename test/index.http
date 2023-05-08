@@ -1,77 +1,129 @@
-### Crear un nuevo comercio
-POST http://localhost:3000/api/comercios
+# Crear un nuevo comercio
+POST http://localhost:3000/api/merchants
 Content-Type: application/json
 
 {
-  "nombre": "Mi tienda",
-  "direccion": "Calle Falsa 123",
-  "telefono": "555-1234"
+  "nombre": "Comercio de prueba",
+  "email": "correo@valido.com",
+  "password": "contraseña-segura",
+  "direccion": "Calle falsa 123",
+  "ciudad": "Ciudad de prueba"
 }
 
-### Modificar un comercio existente
-PUT http://localhost:3000/api/comercios/1
+# Obtener todos los comercios
+GET http://localhost:3000/api/merchants
+
+# Obtener un comercio específico
+GET http://localhost:3000/api/merchants/1
+
+# Actualizar un comercio existente
+PUT http://localhost:3000/api/merchants/1
 Content-Type: application/json
 
 {
-  "nombre": "Mi tienda modificada",
-  "direccion": "Calle Falsa 456",
-  "telefono": "555-5678"
+  "nombre": "Comercio modificado",
+  "email": "correo-modificado@valido.com",
+  "password": "contraseña-segura-modificada",
+  "direccion": "Calle falsa 456",
+  "ciudad": "Ciudad de prueba modificada"
 }
 
-### Obtener una lista de comercios
-GET http://localhost:3000/api/comercios
+# Eliminar un comercio existente
+DELETE http://localhost:3000/api/merchants/1
 
-### Eliminar un comercio existente
-DELETE http://localhost:3000/api/comercios/1
-
-### Crear un nuevo usuario
-POST http://localhost:3000/api/usuarios
+# Crear una nueva página web
+POST http://localhost:3000/api/webpages
 Content-Type: application/json
 
 {
-  "nombre": "Juan",
-  "email": "juan@mimail.com",
-  "ciudad": "Buenos Aires"
+  "ciudad": "Ciudad de prueba",
+  "actividad": "Actividad de prueba",
+  "titulo": "Título de prueba",
+  "resumen": "Resumen de prueba",
+  "idMerchant": 1
 }
 
-### Modificar un usuario existente
-PUT http://localhost:3000/api/usuarios/1
+# Obtener todas las páginas web
+GET http://localhost:3000/api/webpages
+
+# Obtener una página web específica
+GET http://localhost:3000/api/webpages/1
+
+# Actualizar una página web existente
+PUT http://localhost:3000/api/webpages/1
 Content-Type: application/json
 
 {
-  "nombre": "Juan modificado",
-  "email": "juanmodificado@mimail.com",
-  "ciudad": "Córdoba"
+  "ciudad": "Ciudad de prueba modificada",
+  "actividad": "Actividad de prueba modificada",
+  "titulo": "Título de prueba modificado",
+  "resumen": "Resumen de prueba modificado"
 }
 
-### Obtener una lista de usuarios
-GET http://localhost:3000/api/usuarios
+# Eliminar una página web existente
+DELETE http://localhost:3000/api/webpages/1
 
-### Eliminar un usuario existente
-DELETE http://localhost:3000/api/usuarios/1
+# Obtener todas las páginas web públicas
+GET http://localhost:3000/api/webpages/public
 
-### Crear una nueva página web
-POST http://localhost:3000/api/paginas-web
+# Obtener todas las páginas web de una ciudad específica
+GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba
+
+# Obtener todas las páginas web de una ciudad y actividad específicas
+GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba/actividad/Actividad%20de%20prueba
+
+# Obtener el puntaje promedio de todas las páginas web de una ciudad específica
+GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba/score
+
+# Crear un nuevo usuario
+POST http://localhost:3000/api/users
 Content-Type: application/json
 
 {
-  "nombre": "Mi página web",
-  "url": "https://www.mipaginaweb.com",
-  "descripcion": "Mi página web personal"
+  "nombre": "Usuario de prueba",
+  "email": "usuario@valido.com",
+  "password": "contraseña-segura",
+  "ciudad": "Ciudad de prueba"
 }
 
-### Modificar una página web existente
-PUT http://localhost:3000/api/paginas-web/1
+# Crear un nuevo usuario administrador
+POST http://localhost:3000/api/users
 Content-Type: application/json
 
 {
-  "nombre": "Mi página web modificada",
-  "url": "https://www.mipaginawebmodificada.com",
-  "descripcion": "Mi página web personal modificada"
+  "nombre": "Admin",
+  "email": "admin@example.com",
+  "password": "contraseña-segura",
+  "ciudad": "Ciudad de prueba",
+  "rol": "admin"
 }
 
-### Obtener una lista de páginas web
-GET http://localhost:3000/api/paginas-web
+# Obtener todos los usuarios
+GET http://localhost:3000/api/users
 
-### Eliminar una página web existente
-DELETE http://localhost:3000/api/paginas-web/1
+# Obtener un usuario específico
+GET http://localhost:3000/api/users/1
+
+# Actualizar un usuario existente
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+  "nombre": "Usuario modificado",
+  "email": "usuario-modificado@valido.com",
+  "password": "contraseña-segura-modificada",
+  "ciudad": "Ciudad de prueba modificada"
+}
+
+# Eliminar un usuario existente
+DELETE http://localhost:3000/api/users/1
+
+# Votar por una página web existente
+POST http://localhost:3000/api/webpages/1/vote
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "score": 5,
+  "reseña": "Reseña de prueba"
+}
