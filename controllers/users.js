@@ -1,97 +1,116 @@
-const { usersModel } = require('../models');
-const { validationResult } = require('express-validator');
-const { handleHttpError } = require('../utils/handleError');
+const { matchedData } = require("express-validator");
+const { modelUsers } = require("../models");
+const { handleError } = require("../utils/handleError");
 const { encrypt, compare } = require("../utils/handlePassword");
+const { tokenSign } = require("../utils/handleJWT");
 
-/**
- * Obtener lista de usuarios
- * @param {*} req
- * @param {*} res
-*/
+const createUser = async (req, res) => {
+  //const body = req.body; // { body } = req --> es lo mismo
+  req = matchedData(req); //coge los datos que se quieren y no tiene en cuenta el resto de cosas
+  const password = await encrypt(req.password);
+  const body = { ...req, password };
+  try {
+    const dataUser = await modelUsers.create(body);
+    dataUser.set("password", undefined, { strict: false }); //para que no devuelva la contraseña en el json, ademas de select:false en el modelo
 
-const getUsers = async (req, res) => {
-    try{
-        const data = await usersModel.findAll({});
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_GET_USERS', 403);
-    }
-}
-/**
- * Crear un usuario
- * @param {*} req
- * @param {*} res
- * @param {boolean} isAdmin - Indica si el usuario es un admin o no
-*/
+    const data = {
+      token: await tokenSign(dataUser),
+      user: dataUser,
+    };
 
-const createUser = async (req, res, isAdmin = false) => {
-  try{
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-          return res.status(422).json({ errors: errors.array() });
-      }
-      const { name, email, password } = req.body;
-      const encryptedPassword = await encrypt(password);
-      const role = isAdmin ? "admin" : "user";
-      const data = await usersModel.create({ name, email, password: encryptedPassword, role });
-      res.send(data);
-  }catch(err){
-      handleHttpError(res, 'ERROR_CREATE_USER');
+    res.send({ data });
+  } catch (error) {
+    handleError(res, "ERROR_CREATE_USER");
   }
-}
+};
 
-/**
- * Obtener un usuario por id
- * @param {*} req
- * @param {*} res
-*/
+//   LOGIN usuario via POST
+const loginUser = async (req, res) => {
+  req = matchedData(req);
+  const { email, password } = req;
+  try {
+    const user = await modelUsers
+      .findOne({ email })
+      .select("password name role email"); //aplicar filtro para que si devuelva password que sino pusimos que no se devolviera
 
-const getUserById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const data = await usersModel.findOne({ where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, "ERROR_GET_USER_BY_ID");
+    if (!user) {
+      return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
     }
-}
 
-/**
- * Actualizar un usuario por id
- * @param {*} req
- * @param {*} res
-*/
+    const isMatch = await compare(password, user.password); //param (contrasenia sin hash, contrasenia hash)
 
-const updateUserById = async (req, res) => {
-    try{
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        const { id } = req.params;
-        const { name, email, password, role } = req.body;
-        const encryptedPassword = await encrypt(password);
-        const data = await usersModel.update({ name, email, password: encryptedPassword, role }, { where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_UPDATE_USER_BY_ID');
+    if (!isMatch) {
+      return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
     }
-}
 
-/**
- * Eliminar un usuario por id
- * @param {*} req
- * @param {*} res
-*/
+    user.set("password", undefined, { strict: false }); //elimina el campo password del objeto user antes de enviarlo como respuesta
 
-const deleteUserById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const data = await usersModel.destroy({ where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_DELETE_USER_BY_ID');
+    const data = {
+      token: await tokenSign(user),
+      user,
+    };
+
+    res.send({ data });
+  } catch (error) {
+    console.log(error);
+    handleError(res, "ERROR_LOGIN_USER");
+  }
+};
+
+//   BUSCAR usuarios por ciudad via GET
+const getUsersByCity = async (req, res) => {
+  const { city } = req.params; //parametros URL
+  try {
+    const users = await modelUsers.find({ city, allowOffers: true });
+    res.send({ users });
+  } catch (error) {
+    handleError(res, "ERROR_GET_USERS_CITY");
+  }
+};
+
+//   ACTUALIZAR usuario via PUT // TODO que solo el propio user pueda actualizar su user y no el de cualquier otro
+const updateUser = async (req, res) => {
+  try {
+    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
+    const { id } = req.params;
+    const { user } = req;
+    if (id.toString() !== user._id.toString()) {
+      handleError(res, "ERROR_NOT_YOUR_USER");
+      return;
     }
-}
+    //console.log(req.body);
+    updatedUser = req.body;
+    //const updatedUser = matchedData(req.body);
+    //console.log(updatedUser);
 
-module.exports = { getUsers, createUser, getUserById, updateUserById, deleteUserById };
+    if (updatedUser.password) {
+      updatedUser.password = await encrypt(updatedUser.password);
+    }
+    const data = await modelUsers.findByIdAndUpdate(id, updatedUser, {
+      new: true, //esto es para que el metodo devuelva el usuario actualizado
+    });
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+    handleError(res, "ERROR_UPDATE_USER");
+  }
+};
+
+//   BORRAR usuario via DELETE // TODO que solo el propio user pueda borrar su user y no el de cualquier otro
+const deleteUser = async (req, res) => {
+  try {
+    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
+    const { id } = req.params;
+    const { user } = req;
+    if (id.toString() !== user._id.toString()) {
+      handleError(res, "ERROR_NOT_YOUR_USER");
+      return;
+    }
+    const data = await modelUsers.findByIdAndDelete(id);
+    res.send(data);
+  } catch (err) {
+    handleError(res, "ERROR_DELETE_USER");
+  }
+};
+
+module.exports = {createUser, updateUser, getUsersByCity, deleteUser, loginUser};

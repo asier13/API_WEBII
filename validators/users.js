@@ -1,27 +1,34 @@
-const { check } = require('express-validator');
-const { handleValidator } = require('../utils/handleValidator');
+const { check, param } = require("express-validator");
+const validateResults = require("../utils/handleValidator");
 
-const createUserValidator = [
-  check('name').notEmpty(),
-  check('email').isEmail(),
-  check('password').isLength({ min: 6 })
+const validatorCreateUser = [
+    check("name").exists().notEmpty(),
+    check("email").exists().notEmpty(),
+    check("password").exists().notEmpty(),
+    check("age").exists().notEmpty().isInt(),
+    check("city").exists().notEmpty(),
+    check("interests").exists().notEmpty(),
+    check("allowOffers").exists().isIn(['true', 'false']),
+    (req, res, next) => {
+      validateResults(req, res, next);
+    },
 ];
 
-const validateCreateUser = handleValidator(createUserValidator);
-
-const updateUserByIdValidator = [
-  check('id').isNumeric(),
-  check('name').notEmpty(),
-  check('email').isEmail(),
-  check('password').isLength({ min: 6 })
-];
-
-const validateUpdateUserById = handleValidator(updateUserByIdValidator);
-
-const deleteUserByIdValidator = [
-  check('id').isNumeric()
-];
-
-const validateDeleteUserById = handleValidator(deleteUserByIdValidator);
-
-module.exports = { validateCreateUser, validateUpdateUserById, validateDeleteUserById };
+const validatorLoginUser = [
+    check("email").exists().notEmpty().isEmail(),
+    check("password").exists().notEmpty().isLength({ min: 8 }),
+  
+    (req, res, next) => {
+      validateResults(req, res, next);
+    },
+  ];
+  
+const validatorNeedId = [
+    param("id").notEmpty(),
+  
+    (req, res, next) => {
+      validateResults(req, res, next);
+    },
+  ];
+  
+  module.exports = {validatorCreateUser, validatorNeedId, validatorLoginUser};

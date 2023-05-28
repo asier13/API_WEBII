@@ -1,17 +1,40 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET;
 
-const generateToken = (payload, secret, expiresIn) => {
-  const token = jwt.sign(payload, secret, { expiresIn });
-  return token;
+//    firmar/generar token
+const tokenSign = (user) => {
+  const sign = jwt.sign(
+    {
+      _id: user._id, //payload para verificar que usuario es quien dice ser
+      role: user.role,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "2h",
+    }
+  );
+  return sign;
 };
-
-const verifyToken = (token, secret) => {
+//    firmar/generar token
+const tokenSign2 = (merchant) => {
+  const sign = jwt.sign(
+    {
+      _id: merchant._id, //payload para verificar que merchant es quien dice ser
+      pageId: merchant.pageId,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "72h",
+    }
+  );
+  return sign;
+};
+//    verificar token
+const verifyToken = (tokenJwt) => {
   try {
-    const decoded = jwt.verify(token, secret);
-    return decoded;
-  } catch (error) {
-    return null;
+    return jwt.verify(tokenJwt, JWT_SECRET);
+  } catch (err) {
+    handleError(res, "JWT_TOKEN_NOT_AUTHORIZED");
   }
 };
-
-module.exports = { generateToken, verifyToken };
+module.exports = { tokenSign, tokenSign2, verifyToken };

@@ -1,16 +1,37 @@
-const express = require('express');
-const router = express.Router();
-const { registerPaginaCompleta } = require('../controllers/webpages');
-const { check } = require('express-validator');
+const express = require("express");
+const {
+  uploadContent, getWebPage, getWebPages, getWebPagesByCity, getWebPagesByActivity, getWebPagesByCityAndActivity, deleteWebPage, updateScoring, uploadPhoto, uploadText,
+} = require("../controllers/webpages");
 
-// Ruta para registrar una página completa
-router.post('/webpages', [
-    check('nombre').notEmpty(),
-    check('url').notEmpty(),
-    check('titulo').notEmpty(),
-    check('descripcion').notEmpty(),
-    check('imagen').notEmpty(),
-    check('contenido').notEmpty()
-], registerPaginaCompleta);
+const { uploadMiddleware } = require("../utils/handleStorage");
+
+const {
+  validatorUploadContent,
+  validatorUpdateScoring,
+} = require("../validators/webpages");
+
+const { validatorNeedId } = require("../validators/users");
+
+const { checkRole, checkMerchantId } = require("../middleware/authMiddleware");
+const { authMiddleware, authMiddlewareCommerce } = require("../middleware/authMiddleware");
+
+const router = express.Router();
+
+
+router.get("/:id", getWebPage); 
+
+router.get("/search/:city/:sort?", getWebPagesByCity); 
+
+router.get("/search/:activity/:sort?", getWebPagesByActivity); 
+
+router.get("/search/:city/:activity/:sort?", getWebPagesByCityAndActivity); 
+
+router.patch("/:id", authMiddleware, checkRole(["user", "admin"]), validatorUpdateScoring, updateScoring);
+
+router.post("/:id/photos", authMiddlewareCommerce, checkMerchantId, uploadMiddleware.single("image"), uploadPhoto);
+
+router.post("/:id/texts", authMiddlewareCommerce, checkMerchantId, uploadText); 
+
+router.delete("/:id", authMiddlewareCommerce, checkMerchantId, validatorNeedId, deleteWebPage); 
 
 module.exports = router;

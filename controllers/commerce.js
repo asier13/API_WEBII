@@ -1,119 +1,121 @@
-const { matchedData, validationResult } = require("express-validator");
-const { handleHttpError } = require("../utils/handleError");
-const { merchantsModel } = require("../models");
-const { registerCtrlMerchant } = require("./auth");
-const { registerPagina } = require("./webpages");
+const { matchedData } = require("express-validator");
+const { modelCommerce, modelWebpages } = require("../models");
+const { handleError } = require("../utils/handleError");
+const { v4: uuidv4 } = require("uuid");
+const { tokenSign2 } = require("../utils/handleJWT");
+const { encrypt, compare } = require("../utils/handlePassword");
 
-/**
- * Obtener lista de comercios
- * @param {*} req
- * @param {*} res
-*/
+// CREACION/REGISTRAR comercio via POST
+const createMerchant = async (req, res) => {
+  req = matchedData(req);
+  const password = await encrypt(req.password);
+  const body = { ...req, password };
+  try {
 
+    const pageId = uuidv4();
+
+
+    const commerceData = { ...body, pageId };
+
+    const dataMerchant = await modelCommerce.create(commerceData);
+    dataMerchant.set("password", undefined, { strict: false }); 
+
+    const data = {
+      token: await tokenSign2(dataMerchant),
+      merchant: dataMerchant,
+    };
+    res.send({ data });
+  } catch (error) {
+    handleError(res, "ERROR_CREATE_MERCHANT");
+  }
+};
+
+const loginMerchant = async (req, res) => {
+  req = matchedData(req);
+  const { email, password } = req;
+  try {
+    const merchant = await modelCommerce
+      .findOne({ email })
+      .select("password email pageId"); 
+
+    if (!merchant) {
+      return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
+    }
+
+    const isMatch = await compare(password, merchant.password); 
+    if (!isMatch) {
+      return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
+    }
+
+    merchant.set("password", undefined, { strict: false });
+    const data = {
+      token: await tokenSign2(merchant),
+      merchant,
+    };
+
+    res.send({ data });
+  } catch (error) {
+    console.log(error);
+    handleError(res, "ERROR_LOGIN_MERCHANT");
+  }
+};
+
+//   BUSCAR comercios via GET
 const getMerchants = async (req, res) => {
-    try{
-        const data = await merchantsModel.findAll();
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_GET_MERCHANTS');
+  try {
+    const merchants = await modelCommerce.find({});
+    res.send({ merchants });
+  } catch (error) {
+    handleError(res, "ERROR_GET_MERCHANTS");
+  }
+};
+
+//   BUSCAR comercio via GET
+const getMerchant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const merchant = await modelCommerce.findById(id);
+    if (!merchant) {
+      return handleError(res, "MERCHANT_NOT_FOUND", 404);
     }
-}
+    res.send({ merchant });
+  } catch (error) {
+    handleError(res, "ERROR_GET_MERCHANT");
+  }
+};
 
-/**
- * Obtener un comercio por id
- * @param {*} req
- * @param {*} res
-*/
-
-const getMerchantById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const data = await merchantsModel.findOne({ where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, "ERROR_GET_MERCHANT_BY_ID");
+//   ACTUALIZAR comercio via PUT
+const updateMerchant = async (req, res) => {
+  try {
+    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
+    const { id } = req.params;
+    //const updatedMerchant = matchedData(req.body);
+    const updatedMerchant = req.body;
+    if (updatedMerchant.password) {
+      updatedMerchant.password = await encrypt(updatedMerchant.password);
     }
-}
+    const data = await modelCommerce.findByIdAndUpdate(id, updatedMerchant, {
+      new: true, //esto es para que el metodo devuelva el comercio actualizado
+    });
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+    handleError(res, "ERROR_UPDATE_MERCHANT");
+  }
+};
 
-/**
- * Registrar un comercio
- * @param {*} req
- * @param {*} res
-*/
 
-const registerMerchant = async (req, res) => {
-    try{
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        const { nombre, email, password, direccion, ciudad } = req.body;
-        const dataMerchant = await merchantsModel.create({ nombre, email, password, direccion, ciudad });
-        const reqUser = {
-            name: nombre,
-            age:-1,
-            email,
-            password,
-            role: "merchant"
-        }
-        const resUser = res;
-        await registerCtrlMerchant(reqUser, resUser);
-        const pagina = {
-            idMerchant: dataMerchant.id,
-            ciudad,
-            actividad: "",
-            titulo: "",
-            resumen: ""
-        }
-        let varObj = {
-            id: 1
-        }
-        await registerPagina(pagina, varObj);
-        const data = {
-            idpagina : varObj.id,
-            merchant: dataMerchant
-        }
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, "ERROR_REGISTER_MERCHANT");
-    }
-}
+const deleteMerchant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const commerce = await modelCommerce.findByIdAndDelete(id);
+    const pageId = commerce.pageId;
+    await modelWebpages.findOneAndDelete({ pageId: pageId });
+    res.send(commerce);
+  } catch (err) {
+    console.log(err);
+    handleError(res, "ERROR_DELETE_MERCHANT");
+  }
+};
 
-/**
- * Actualizar un comercio por id
- * @param {*} req
- * @param {*} res
-*/
-
-const updateMerchantById = async (req, res) => {
-    try{
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        const { id } = req.params;
-        const { nombre, email, password, direccion, ciudad } = req.body;
-        const data = await merchantsModel.update({ nombre, email, password, direccion, ciudad }, { where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_UPDATE_MERCHANT_BY_ID');
-    }
-}
-
-/**
- * Eliminar un comercio por id
- * @param {*} req
- * @param {*} res
-*/
-
-const deleteMerchantById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const data = await merchantsModel.destroy({ where: { id } });
-        res.send(data);
-    }catch(err){
-        handleHttpError(res, 'ERROR_DELETE_MERCHANT_BY_ID');
-    }
-}
-
-module.exports = { getMerchants, getMerchantById, registerMerchant, updateMerchantById, deleteMerchantById };
+module.exports = {getMerchant, getMerchants, createMerchant, updateMerchant, deleteMerchant, loginMerchant};

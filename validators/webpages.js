@@ -1,13 +1,29 @@
-const { check } = require('express-validator');
-const { handleValidator } = require('../utils/handleValidator');
+const { check, param } = require("express-validator");
+const validateResults = require("../utils/handleValidator");
 
-const registerPaginaCompletaValidator = [
-  check('ciudad').notEmpty(),
-  check('actividad').notEmpty(),
-  check('titulo').notEmpty(),
-  check('resumen').notEmpty()
+const validatorUploadContent = [
+  param("id").notEmpty(),
+  check("city").exists().notEmpty().isLength({min:3, max:30}),
+  check("activity").exists().notEmpty(),
+  check("title").exists().notEmpty().isLength({min:5, max:100}),
+  check("summary").exists().notEmpty().isLength({min:5, max:255}),
+
+  (req, res, next) => {
+    validateResults(req, res, next);
+  },
 ];
 
-const validateRegisterPaginaCompleta = handleValidator(registerPaginaCompletaValidator);
+const validatorUpdateScoring = [
+  check("nonEditable.scoring")
+    .isArray({ min: 1 })
+    .custom((value) => value.every((val) => typeof val === "number")),
+  check("nonEditable.reviews")
+    .isArray({ min: 1 })
+    .custom((value) => value.every((val) => typeof val === "string")),
 
-module.exports = { validateRegisterPaginaCompleta };
+  (req, res, next) => {
+    validateResults(req, res, next);
+  },
+];
+
+module.exports = {validatorUploadContent,validatorUpdateScoring};

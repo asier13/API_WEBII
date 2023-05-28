@@ -1,129 +1,329 @@
-# Crear un nuevo comercio
-POST http://localhost:3000/api/merchants
+### PRUEBAS USER
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: application/json
+ 
+{
+    "name": "asier",
+    "age": 35,
+    "email": "asier@gmail.com",
+    "password": "prueba1010", 
+    "city": "madrid",
+    "interests": "trading",  
+    "allowOffers": "true"
+}
+### 
+POST http://localhost:3000/api/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "nombre": "Comercio de prueba",
-  "email": "correo@valido.com",
-  "password": "contraseña-segura",
-  "direccion": "Calle falsa 123",
-  "ciudad": "Ciudad de prueba"
+    "email": "asier@gmail.com",
+    "password": "prueba1010" 
 }
 
-# Obtener todos los comercios
-GET http://localhost:3000/api/merchants
+###
+PUT http://localhost:3000/api/users/6473d98b6275b318f8dbd8e8 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDczZDk4YjYyNzViMzE4ZjhkYmQ4ZTgiLCJyb2xlIjoidXNlciIsImlhdCI6MTY4NTMxNDA3MCwiZXhwIjoxNjg1MzIxMjcwfQ.9-l5L5t_TZtEJDL19CQO5P4Pyys9O4GO-QxtNiw5vI0
 
-# Obtener un comercio específico
-GET http://localhost:3000/api/merchants/1
+{
+    "name": "Asier",
+    "age": "35",
+    "email": "asier@gmail.com"
+}
+### 
+GET http://localhost:3000/api/webpages/
 
-# Actualizar un comercio existente
-PUT http://localhost:3000/api/merchants/1
+### MIRAR LAS WEBPAGES
+GET http://localhost:3000/api/webpages/
+### 
+GET http://localhost:3000/api/webpages/search/barcelona
+### 
+GET http://localhost:3000/api/webpages/search/barcelona/sort
+### 
+PATCH http://localhost:3000/api/webpages/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+  "nonEditable": {
+    "scoring": [10],
+    "reviews": [
+      "Buen comercio, lo recomiendo"
+    ]
+  }
+}
+### PARA HACER DELETE
+DELETE http://localhost:3000/api/users/ 
+Authorization: Bearer 
+
+
+
+### PRUEBAS ADMIN 
+POST http://localhost:3000/api/users/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "nombre": "Comercio modificado",
-  "email": "correo-modificado@valido.com",
-  "password": "contraseña-segura-modificada",
-  "direccion": "Calle falsa 456",
-  "ciudad": "Ciudad de prueba modificada"
+    "name": "ADMIN",
+    "age": "22",
+    "email": "ADMIN@ADMIN.com",
+    "password": "adminrules", 
+    "city": "madrid", 
+    "interests": "cripto", 
+    "allowOffers": "false",
+}
+###
+POST http://localhost:3000/api/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "ADMIN@ADMIN.com",
+    "password": "adminrules" 
+}
+###
+POST http://localhost:3000/api/commerce/register HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "name": "Alpha",
+    "cif": "59748316",
+    "address": "alpha 21",
+    "email": "alpha@gmail.com", 
+    "password": "alpha",
+    "contact": "688145976"
+}
+###
+POST http://localhost:3000/api/commerce/register HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "name": "Regal",
+    "cif": "67913452",
+    "address": "regal 13",
+    "email": "regal@gmail.com", 
+    "password": "regal456",
+    "contact": "713846175"
+}
+### 
+GET http://localhost:3000/api/commerce/
+Authorization: Bearer 
+###
+GET http://localhost:3000/api/commerce/
+Authorization: Bearer 
+###
+PUT http://localhost:3000/api/commerce/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "name": "Regal",
+    "cif": "33445566",
+    "address": "vasili 18",
+    "email": "regal@live.regal.com", 
+    "password": "queenbishop",
+    "contact": "682476534"
+}
+###
+DELETE http://localhost:3000/api/commerce/
+Authorization: Bearer 
+
+### PRUEBAS MERCHANT 
+POST http://localhost:3000/api/commerce/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "regal@gmail.com",
+    "password": "regal456" 
+}
+###
+POST http://localhost:3000/api/webpages/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "city": "madrid",
+    "activity": "cripto",
+    "title": "Crear una cripto",
+    "resumen": "hacer una memecoin para forrarnos" 
+}
+###
+POST http://localhost:3000/api/webpages/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "city": "barcelona",
+    "activity": "trading",
+    "title": "Trading XAU",
+    "reusmen": "operar oro en Metatrader" 
+}
+### 
+GET http://localhost:3000/api/users/madrid
+Authorization: Bearer ###     WEBPAGES SUBIR FOTO / TEXTO
+POST http://localhost:3000/api/webpages/"pagina"/photos HTTP/1.1 
+Content-Type: multipart/form-data; boundary=Boundry
+Authorization: Bearer 
+--Boundry
+Content-Disposition: form-data; name="image"; filename="dunes.png"
+Content-Type: image/png
+
+< ./dunes.png
+--Boundry--
+### 
+POST http://localhost:3000/api/webpages/"pagina_a_modificar"/texts HTTP/1.1 
+Content-Type: application/json
+Authorization: Bearer 
+{
+    "texts":["buenas", "noches"]
 }
 
-# Eliminar un comercio existente
-DELETE http://localhost:3000/api/merchants/1
 
-# Crear una nueva página web
-POST http://localhost:3000/api/webpages
+##Usuarios
+GET http://localhost:3000/api/users/madrid
+
+###
+POST http://localhost:3000/api/users/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "ciudad": "Ciudad de prueba",
-  "actividad": "Actividad de prueba",
-  "titulo": "Título de prueba",
-  "resumen": "Resumen de prueba",
-  "idMerchant": 1
+    "name": "ADMIN",
+    "age": "22",
+    "email": "ADMIN@ADMIN.com",
+    "password": "root", 
+    "city": "madrid", 
+    "allowOffers": "false",
+    "role": "admin"
 }
 
-# Obtener todas las páginas web
-GET http://localhost:3000/api/webpages
-
-# Obtener una página web específica
-GET http://localhost:3000/api/webpages/1
-
-# Actualizar una página web existente
-PUT http://localhost:3000/api/webpages/1
+### 
+POST http://localhost:3000/api/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "ciudad": "Ciudad de prueba modificada",
-  "actividad": "Actividad de prueba modificada",
-  "titulo": "Título de prueba modificado",
-  "resumen": "Resumen de prueba modificado"
+    "email": "prueba@gmail.com",
+    "password": "prueba2023" 
 }
 
-# Eliminar una página web existente
-DELETE http://localhost:3000/api/webpages/1
-
-# Obtener todas las páginas web públicas
-GET http://localhost:3000/api/webpages/public
-
-# Obtener todas las páginas web de una ciudad específica
-GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba
-
-# Obtener todas las páginas web de una ciudad y actividad específicas
-GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba/actividad/Actividad%20de%20prueba
-
-# Obtener el puntaje promedio de todas las páginas web de una ciudad específica
-GET http://localhost:3000/api/webpages/ciudad/Ciudad%20de%20prueba/score
-
-# Crear un nuevo usuario
-POST http://localhost:3000/api/users
+###
+POST http://localhost:3000/api/users HTTP/1.1
 Content-Type: application/json
 
 {
-  "nombre": "Usuario de prueba",
-  "email": "usuario@valido.com",
-  "password": "contraseña-segura",
-  "ciudad": "Ciudad de prueba"
+    "name": "Jorge",
+    "age": "17",
+    "email": "george@gmail.com",
+    "password": "georgimola", 
+    "city": "valencia", 
+    "allowOffers": "true"
 }
 
-# Crear un nuevo usuario administrador
-POST http://localhost:3000/api/users
+
+### 
+PUT http://localhost:3000/api/users/"usuario_a_modificar" HTTP/1.1
 Content-Type: application/json
 
 {
-  "nombre": "Admin",
-  "email": "admin@example.com",
-  "password": "contraseña-segura",
-  "ciudad": "Ciudad de prueba",
-  "rol": "admin"
+    "name": "David",
+    "age": "27",
+    "email": "david@gmail.com",
+    "password": "david2023", 
+    "city": "barcelona", 
+    "allowOffers": "false"
 }
 
-# Obtener todos los usuarios
-GET http://localhost:3000/api/users
-
-# Obtener un usuario específico
-GET http://localhost:3000/api/users/1
-
-# Actualizar un usuario existente
-PUT http://localhost:3000/api/users/1
+###             PRUEBAS MERCHANTS/COMMERCES 
+POST http://localhost:3000/api/commerce HTTP/1.1
 Content-Type: application/json
 
 {
-  "nombre": "Usuario modificado",
-  "email": "usuario-modificado@valido.com",
-  "password": "contraseña-segura-modificada",
-  "ciudad": "Ciudad de prueba modificada"
+    "name": "U-tad",
+    "cif": "91210899",
+    "address": "Goya 5",
+    "email": "u-tad@gmail.com", 
+    "contact": "689096087"
 }
 
-# Eliminar un usuario existente
-DELETE http://localhost:3000/api/users/1
+### 
 
-# Votar por una página web existente
-POST http://localhost:3000/api/webpages/1/vote
+POST http://localhost:3000/api/commerce HTTP/1.1
 Content-Type: application/json
 
 {
-  "userId": 1,
-  "score": 5,
-  "reseña": "Reseña de prueba"
+    "name": "Rolex",
+    "cif": "54365299",
+    "address": "Peluco 13",
+    "email": "rolex@gmail.com", 
+    "contact": "629079153"
+}
+### 
+
+PUT http://localhost:3000/api/commerce/"comercio_a_modificar" HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Nidoo",
+    "cif": "54698741",
+    "address": "Glass 7",
+    "email": "nidoo@gmail.com", 
+    "contact": "670735912"
+}
+
+### 
+GET http://localhost:3000/api/commerce/
+
+###
+GET http://localhost:3000/api/commerce/
+
+### 
+
+DELETE http://localhost:3000/api/commerce/
+
+###      
+
+POST http://localhost:3000/api/webpages/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "webpageId": "",
+    "city": "madrid",
+    "activity": "cripto",
+    "title": "Crear una cripto",
+    "summary": "hacer una memecoin para forrarnos", 
+    "texts": ["we", "moon"]
+}
+###
+DELETE http://localhost:3000/api/webpages/
+### 
+
+POST http://localhost:3000/api/webpages/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "webpageId": "",
+    "city": "madrid",
+    "activity": "gaming",
+    "title": "Competicion de Call of Duty",
+    "summary": "competicion entre 6 equipos en Ifema", 
+    "texts": ["lets", "go"]
+}
+
+###
+GET http://localhost:3000/api/webpages/ HTTP/1.1
+
+###
+GET http://localhost:3000/api/webpages/ HTTP/1.1
+
+###     WEBPAGES SUBIR FOTO / TEXTO
+
+POST http://localhost:3000/api/webpages/"webpage_token"/photos HTTP/1.1 
+Content-Type: multipart/form-data; boundary=Boundry
+
+--Boundry
+Content-Disposition: form-data; name="image"; filename="dunes.png"
+Content-Type: image/png
+
+< ./dunes.png
+--Boundry--
+
+### 
+POST http://localhost:3000/api/webpages/"webpage_token"/texts HTTP/1.1 
+Content-Type: application/json
+
+{
+    "texts":["hola", "que tal"]
 }

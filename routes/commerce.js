@@ -1,39 +1,28 @@
-const express = require('express');
+const express = require("express");
+const {getMerchant, getMerchants, createMerchant, updateMerchant, deleteMerchant, loginMerchant,
+} = require("../controllers/commerce");
+const {
+  validatorCreateMerchant,
+  validatorLoginMerchant,
+} = require("../validators/commerce");
+
+const { validatorNeedId } = require("../validators/users");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+const { checkRole } = require("../middleware/authMiddleware");
+
 const router = express.Router();
-const { 
-    getcommerce, 
-    getMerchantById, 
-    registerMerchant, 
-    updateMerchantById, 
-    deleteMerchantById 
-} = require('../controllers/commerce');
-const { check } = require('express-validator');
 
-// Ruta para obtener todos los comercios
-router.get('/commerce', getcommerce);
+router.get("/", authMiddleware, checkRole(["admin"]), getMerchants); //ADMIN
 
-// Ruta para obtener un comercio por id
-router.get('/commerce/:id', getMerchantById);
+router.get("/:id", authMiddleware, checkRole(["admin"]), getMerchant); //ADMIN
 
-// Ruta para registrar un nuevo comercio
-router.post('/commerce', [
-    check('nombre').notEmpty(),
-    check('email').isEmail(),
-    check('password').notEmpty(),
-    check('direccion').notEmpty(),
-    check('ciudad').notEmpty()
-], registerMerchant);
+router.post("/register", authMiddleware, checkRole(["admin"]), validatorCreateMerchant, createMerchant); 
 
-// Ruta para actualizar un comercio por id
-router.put('/commerce/:id', [
-    check('nombre').notEmpty(),
-    check('email').isEmail(),
-    check('password').notEmpty(),
-    check('direccion').notEmpty(),
-    check('ciudad').notEmpty()
-], updateMerchantById);
+router.post("/login", validatorLoginMerchant, loginMerchant); //MERCHANT
 
-// Ruta para eliminar un comercio por id
-router.delete('/commerce/:id', deleteMerchantById);
+router.put("/:id", authMiddleware, checkRole(["admin"]), validatorNeedId, updateMerchant); 
+
+router.delete("/:id", authMiddleware, checkRole(["admin"]), validatorNeedId, deleteMerchant); //ADMIN
 
 module.exports = router;
