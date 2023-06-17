@@ -3,9 +3,9 @@ POST http://localhost:3000/api/users/register HTTP/1.1
 Content-Type: application/json
  
 {
-    "name": "asier",
-    "age": 35,
-    "email": "asier@gmail.com",
+    "name": "kaan",
+    "age": 20,
+    "email": "kaan@gmail.com",
     "password": "prueba1010", 
     "city": "madrid",
     "interests": "trading",  
@@ -16,19 +16,19 @@ POST http://localhost:3000/api/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "email": "asier@gmail.com",
+    "email": "kaan@gmail.com",
     "password": "prueba1010" 
 }
 
 ###
-PUT http://localhost:3000/api/users/6473d98b6275b318f8dbd8e8 HTTP/1.1
+PUT http://localhost:3000/api/users/647480710691213df7b4cfe7 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDczZDk4YjYyNzViMzE4ZjhkYmQ4ZTgiLCJyb2xlIjoidXNlciIsImlhdCI6MTY4NTMxNDA3MCwiZXhwIjoxNjg1MzIxMjcwfQ.9-l5L5t_TZtEJDL19CQO5P4Pyys9O4GO-QxtNiw5vI0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0ODA3MTA2OTEyMTNkZjdiNGNmZTciLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2ODUzNTY3OTEsImV4cCI6MTY4NTM2Mzk5MX0.O1qJoYGzysacEjZxvUdo0ALUYbqCh1F6HWQo4G3LAc8
 
 {
-    "name": "Asier",
-    "age": "35",
-    "email": "asier@gmail.com"
+    "name": "Jorge",
+    "age": "36",
+    "email": "jorge@gmail.com"
 }
 ### 
 GET http://localhost:3000/api/webpages/
@@ -36,10 +36,13 @@ GET http://localhost:3000/api/webpages/
 ### MIRAR LAS WEBPAGES
 GET http://localhost:3000/api/webpages/
 ### 
-GET http://localhost:3000/api/webpages/search/barcelona
+GET http://localhost:3000/api/webpages/search/madrid
 ### 
-GET http://localhost:3000/api/webpages/search/barcelona/sort
+GET http://localhost:3000/api/webpages/search/madrid/cripto
 ### 
+GET http://localhost:3000/api/webpages/search/city/activity/sort
+
+###
 PATCH http://localhost:3000/api/webpages/ HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer 
@@ -81,14 +84,15 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/api/commerce/register HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0OTIxOWVkNWU3ZGQwYjczZDI3OWEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2ODUzNjIyNzIsImV4cCI6MTY4NTM2OTQ3Mn0.jxZXjG-s1Uwsg39xyjcIvUxEzhPkwLYbJZ1wcoHSrYk
+
 {
     "name": "Alpha",
-    "cif": "59748316",
+    "cif": "597483168",
     "address": "alpha 21",
     "email": "alpha@gmail.com", 
-    "password": "alpha",
-    "contact": "688145976"
+    "password": "alphamolamucho",
+    "telefono": "688145976"
 }
 ###
 POST http://localhost:3000/api/commerce/register HTTP/1.1
@@ -104,7 +108,8 @@ Authorization: Bearer
 }
 ### 
 GET http://localhost:3000/api/commerce/
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0OTIxOWVkNWU3ZGQwYjczZDI3OWEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2ODUzNjIyNzIsImV4cCI6MTY4NTM2OTQ3Mn0.jxZXjG-s1Uwsg39xyjcIvUxEzhPkwLYbJZ1wcoHSrYk
+
 ###
 GET http://localhost:3000/api/commerce/
 Authorization: Bearer 
@@ -133,14 +138,15 @@ Content-Type: application/json
     "password": "regal456" 
 }
 ###
-POST http://localhost:3000/api/webpages/ HTTP/1.1
+POST http://localhost:3000/api/webpages/20c13554-3116-4c94-9548-4b28a9a8d6ad HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0OTcxNzMyNDhjOGRlNGQ1NWQ4ZmQiLCJwYWdlSWQiOiIyMGMxMzU1NC0zMTE2LTRjOTQtOTU0OC00YjI4YTlhOGQ2YWQiLCJpYXQiOjE2ODUzNjI0NTYsImV4cCI6MTY4NTYyMTY1Nn0.pZI2B555dvG3i7KFyr_T7lAZZRpLL2kCZVcNuD39dCk
+
 {
     "city": "madrid",
     "activity": "cripto",
     "title": "Crear una cripto",
-    "resumen": "hacer una memecoin para forrarnos" 
+    "summary": "hacer una memecoin para forrarnos" 
 }
 ###
 POST http://localhost:3000/api/webpages/ HTTP/1.1
@@ -154,10 +160,12 @@ Authorization: Bearer
 }
 ### 
 GET http://localhost:3000/api/users/madrid
-Authorization: Bearer ###     WEBPAGES SUBIR FOTO / TEXTO
-POST http://localhost:3000/api/webpages/"pagina"/photos HTTP/1.1 
-Content-Type: multipart/form-data; boundary=Boundry
 Authorization: Bearer 
+### WEBPAGES SUBIR FOTO / TEXTO
+POST http://localhost:3000/api/webpages/20c13554-3116-4c94-9548-4b28a9a8d6ad/photos HTTP/1.1 
+Content-Type: multipart/form-data; boundary=Boundry
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0OTcxNzMyNDhjOGRlNGQ1NWQ4ZmQiLCJwYWdlSWQiOiIyMGMxMzU1NC0zMTE2LTRjOTQtOTU0OC00YjI4YTlhOGQ2YWQiLCJpYXQiOjE2ODUzNjI0NTYsImV4cCI6MTY4NTYyMTY1Nn0.pZI2B555dvG3i7KFyr_T7lAZZRpLL2kCZVcNuD39dCk
+
 --Boundry
 Content-Disposition: form-data; name="image"; filename="dunes.png"
 Content-Type: image/png
@@ -173,8 +181,9 @@ Authorization: Bearer
 }
 
 
-##Usuarios
+###Usuarios
 GET http://localhost:3000/api/users/madrid
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc0OTIxOWVkNWU3ZGQwYjczZDI3OWEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2ODUzNjIyNzIsImV4cCI6MTY4NTM2OTQ3Mn0.jxZXjG-s1Uwsg39xyjcIvUxEzhPkwLYbJZ1wcoHSrYk
 
 ###
 POST http://localhost:3000/api/users/register HTTP/1.1

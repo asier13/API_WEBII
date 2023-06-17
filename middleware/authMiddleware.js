@@ -4,7 +4,7 @@ const { modelUsers, modelCommerce } = require("../models");
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = getAndVerifyToken(req, res);
+    const token = await getAndVerifyToken(req, res);
     if (!token) return;
 
     const user = await modelUsers.findById(token._id);
@@ -18,19 +18,19 @@ const authMiddleware = async (req, res, next) => {
 
 const authMiddlewareCommerce = async (req, res, next) => {
   try {
-    const token = getAndVerifyToken(req, res);
+    const token = await getAndVerifyToken(req, res);
     if (!token) return;
 
     const merchant = await modelCommerce.findById(token._id);
     req.merchant = merchant; 
-
+    
     next(); 
   } catch (err) {
     handleError(res, "NOT_SESSION", 401);
   }
 };
 
-// Function to get and verify token
+
 const getAndVerifyToken = async (req, res) => {
     if (!req.headers.authorization) {
       handleError(res, "NO_TOKEN", 401);
@@ -52,6 +52,7 @@ const getAndVerifyToken = async (req, res) => {
 const checkRole = (roles) => async (req, res, next) => {
   try {
     const { user } = req;
+    console.log(user)
     const rolesByUser = user.role;
 
     const checkValueRole = roles.some((rolSingle) =>
@@ -65,6 +66,7 @@ const checkRole = (roles) => async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error)
     handleError(res, "ERROR_ROLE_PERMISSIONS");
   }
 };
@@ -73,6 +75,7 @@ const checkMerchantId = async (req, res, next) => {
   try {
     const { merchant } = req;
     const merchantWebPage = merchant.pageId;
+
 
     const pageId = req.params.id;
 
@@ -83,6 +86,7 @@ const checkMerchantId = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error)
     handleError(res, "ERROR_ROLE_PERMISSIONS");
   }
 };

@@ -5,13 +5,13 @@ const { encrypt, compare } = require("../utils/handlePassword");
 const { tokenSign } = require("../utils/handleJWT");
 
 const createUser = async (req, res) => {
-  //const body = req.body; // { body } = req --> es lo mismo
-  req = matchedData(req); //coge los datos que se quieren y no tiene en cuenta el resto de cosas
+
+  req = matchedData(req); 
   const password = await encrypt(req.password);
   const body = { ...req, password };
   try {
     const dataUser = await modelUsers.create(body);
-    dataUser.set("password", undefined, { strict: false }); //para que no devuelva la contraseña en el json, ademas de select:false en el modelo
+    dataUser.set("password", undefined, { strict: false }); 
 
     const data = {
       token: await tokenSign(dataUser),
@@ -24,26 +24,26 @@ const createUser = async (req, res) => {
   }
 };
 
-//   LOGIN usuario via POST
+
 const loginUser = async (req, res) => {
   req = matchedData(req);
   const { email, password } = req;
   try {
     const user = await modelUsers
       .findOne({ email })
-      .select("password name role email"); //aplicar filtro para que si devuelva password que sino pusimos que no se devolviera
+      .select("password name role email"); 
 
     if (!user) {
       return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
     }
 
-    const isMatch = await compare(password, user.password); //param (contrasenia sin hash, contrasenia hash)
+    const isMatch = await compare(password, user.password); 
 
     if (!isMatch) {
       return handleError(res, "LOGIN_FAILED_INVALID_CRED", 401);
     }
 
-    user.set("password", undefined, { strict: false }); //elimina el campo password del objeto user antes de enviarlo como respuesta
+    user.set("password", undefined, { strict: false }); 
 
     const data = {
       token: await tokenSign(user),
@@ -57,9 +57,9 @@ const loginUser = async (req, res) => {
   }
 };
 
-//   BUSCAR usuarios por ciudad via GET
+
 const getUsersByCity = async (req, res) => {
-  const { city } = req.params; //parametros URL
+  const { city } = req.params; 
   try {
     const users = await modelUsers.find({ city, allowOffers: true });
     res.send({ users });
@@ -68,26 +68,21 @@ const getUsersByCity = async (req, res) => {
   }
 };
 
-//   ACTUALIZAR usuario via PUT // TODO que solo el propio user pueda actualizar su user y no el de cualquier otro
 const updateUser = async (req, res) => {
   try {
-    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
     const { id } = req.params;
     const { user } = req;
     if (id.toString() !== user._id.toString()) {
       handleError(res, "ERROR_NOT_YOUR_USER");
       return;
     }
-    //console.log(req.body);
     updatedUser = req.body;
-    //const updatedUser = matchedData(req.body);
-    //console.log(updatedUser);
 
     if (updatedUser.password) {
       updatedUser.password = await encrypt(updatedUser.password);
     }
     const data = await modelUsers.findByIdAndUpdate(id, updatedUser, {
-      new: true, //esto es para que el metodo devuelva el usuario actualizado
+      new: true, 
     });
     res.send(data);
   } catch (err) {
@@ -96,10 +91,9 @@ const updateUser = async (req, res) => {
   }
 };
 
-//   BORRAR usuario via DELETE // TODO que solo el propio user pueda borrar su user y no el de cualquier otro
+
 const deleteUser = async (req, res) => {
   try {
-    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
     const { id } = req.params;
     const { user } = req;
     if (id.toString() !== user._id.toString()) {

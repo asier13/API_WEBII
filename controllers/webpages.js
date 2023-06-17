@@ -3,7 +3,6 @@ const { modelWebpages } = require("../models");
 const { handleError } = require("../utils/handleError");
 const PUBLIC_URL = process.env.PUBLIC_URL;
 
-//   SUBIR contenido via POST
 const uploadContent = async (req, res) => {
   const { id } = req.params;
 
@@ -24,7 +23,7 @@ const uploadContent = async (req, res) => {
   }
 };
 
-//   BUSCAR pagina web via GET
+
 const getWebPage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -47,6 +46,7 @@ const getWebPages = async (req, res) => {
     handleError(res, "ERROR_GET_WEBPAGES");
   }
 };
+
 const getWebPagesByCity = async (req, res) => {
     const { city, sort } = req.params;
     try {
@@ -66,9 +66,8 @@ const getWebPagesByCity = async (req, res) => {
     }
   };
   
-//   BUSCAR paginas web por actividad via GET
 const getWebPagesByActivity = async (req, res) => {
-  const { activity, sort } = req.params; //parametros URL
+  const { activity, sort } = req.params; 
   try {
     let webpages = await modelWebpages.find({ activity });
     if (sort) {
@@ -82,7 +81,7 @@ const getWebPagesByActivity = async (req, res) => {
   }
 };
 
-//   BUSCAR paginas web por ciudad y actividad via GET
+
 const getWebPagesByCityAndActivity = async (req, res) => {
   const { city, activity, sort } = req.params;
   try {
@@ -104,14 +103,14 @@ const getWebPagesByCityAndActivity = async (req, res) => {
 const updateScoring = async (req, res) => {
     const { id } = req.params;
     const { scoring, reviews } = req.body.nonEditable;
-  
+    console.log(id)
     if(!scoring || !reviews){
       return handleError(res, "MISSING_FIELDS");
     }
   
     try {
       const updatedContent = await modelWebpages.findOneAndUpdate(
-        { webpageId: id },
+        { _id: id },
         {
           $push: {
             "nonEditable.scoring": scoring,
@@ -191,7 +190,7 @@ const updateScoring = async (req, res) => {
     }
   };
   
-//   BORRAR pagina web via DELETE
+
 const deleteWebPage = async (req, res) => {
   try {
     const { id } = req.params;

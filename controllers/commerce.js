@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const { tokenSign2 } = require("../utils/handleJWT");
 const { encrypt, compare } = require("../utils/handlePassword");
 
-// CREACION/REGISTRAR comercio via POST
+
 const createMerchant = async (req, res) => {
   req = matchedData(req);
   const password = await encrypt(req.password);
@@ -60,7 +60,7 @@ const loginMerchant = async (req, res) => {
   }
 };
 
-//   BUSCAR comercios via GET
+
 const getMerchants = async (req, res) => {
   try {
     const merchants = await modelCommerce.find({});
@@ -70,7 +70,7 @@ const getMerchants = async (req, res) => {
   }
 };
 
-//   BUSCAR comercio via GET
+
 const getMerchant = async (req, res) => {
   try {
     const { id } = req.params;
@@ -84,18 +84,15 @@ const getMerchant = async (req, res) => {
   }
 };
 
-//   ACTUALIZAR comercio via PUT
 const updateMerchant = async (req, res) => {
   try {
-    //primero valido que el usuario que se esta solicitando actualizar es el mismo que ha hecho la solicitud gracias a la inyeccion de datos de usuario en el middleware session.js
     const { id } = req.params;
-    //const updatedMerchant = matchedData(req.body);
     const updatedMerchant = req.body;
     if (updatedMerchant.password) {
       updatedMerchant.password = await encrypt(updatedMerchant.password);
     }
     const data = await modelCommerce.findByIdAndUpdate(id, updatedMerchant, {
-      new: true, //esto es para que el metodo devuelva el comercio actualizado
+      new: true, 
     });
     res.send(data);
   } catch (err) {

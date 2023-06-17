@@ -1,8 +1,6 @@
-//Para la creacion de comercios (== merchants)
 
 const mongoose = require("mongoose");
 
-// TODO  hay que darle un ID para su pagina una vez registrado el comercio
 const Merchants = new mongoose.Schema(
   {
     name: {

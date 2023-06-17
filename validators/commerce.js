@@ -7,7 +7,7 @@ const validatorCreateMerchant = [
   check("address").exists().notEmpty(),
   check("password").exists().notEmpty().isLength({ min: 8 }),
   check("email").exists().notEmpty().isEmail(),
-  check("telefono").exists().notEmpty().isMobilePhone("es-ES"), 
+  check("telefono").exists().notEmpty(), 
   (req, res, next) => {
       return validateResults(req, res, next);
   }
